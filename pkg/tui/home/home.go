@@ -47,6 +47,7 @@ type Model struct {
 func New() tea.Model {
 	items := []list.Item{
 		item{Name: "Recipes", Description: "View and run recipes"},
+		item{Name: "HyperShift Clusters", Description: "View and manage HyperShift clusters"},
 	}
 
 	styles := styles.DefaultStyles()

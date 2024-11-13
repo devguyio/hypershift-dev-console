@@ -1,0 +1,4 @@
+version: 0.1
+name: "hypershift-azure-hosted-cluster"
+display-name: "HyperShift Azure Hosted Cluster"
+description: "Set of recipes for managing HyperShift Azure Hosted Cluster"

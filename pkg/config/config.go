@@ -12,28 +12,8 @@
  * limitations under the License.
  */
 
-package main
+package config
 
-import (
-	"fmt"
-	"os"
-
-	tea "github.com/charmbracelet/bubbletea"
-
-	"hypershift-dev-console/pkg/config"
-	"hypershift-dev-console/pkg/tui"
-)
-
-func main() {
-	cfg := &config.Config{
-		RecipesDir: "recipes",
-	}
-	p := tea.NewProgram(tui.NewModel(cfg), tea.WithAltScreen())
-
-	_, err := p.Run()
-	if err != nil {
-		fmt.Println("Error running program:", err)
-		os.Exit(1)
-	}
-
+type Config struct {
+	RecipesDir string
 }

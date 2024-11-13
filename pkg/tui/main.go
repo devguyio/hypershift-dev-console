@@ -17,9 +17,11 @@ package tui
 import (
 	tea "github.com/charmbracelet/bubbletea"
 
+	"hypershift-dev-console/pkg/config"
 	"hypershift-dev-console/pkg/tui/home"
 	"hypershift-dev-console/pkg/tui/keys"
 	"hypershift-dev-console/pkg/tui/recipes"
+	"hypershift-dev-console/pkg/tui/recipes/run"
 	"hypershift-dev-console/pkg/tui/styles"
 )
 
@@ -27,24 +29,28 @@ type uiState int
 
 const (
 	homeUI uiState = iota
-	modelsUI
+	recipesUI
+	runRecipeUI
 	unknown
 )
 
 type Model struct {
-	models     tea.Model
 	home       tea.Model
+	recipes    tea.Model
+	runRecipe  tea.Model
 	keyMap     *keys.KeyMap
 	currentUI  uiState
 	styles     styles.Styles
 	windowSize tea.WindowSizeMsg
+	cfg        *config.Config
 }
 
-func NewModel() Model {
+func NewModel(cfg *config.Config) Model {
 
 	return Model{
 		home:      home.New(),
 		currentUI: homeUI,
+		cfg:       cfg,
 	}
 }
 
@@ -78,16 +84,22 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.windowSize = msg
 	case home.SelectMessage:
-		m.currentUI = modelsUI
-		m.models = recipes.New()
-		cmds = append(cmds, m.models.Init())
+		m.currentUI = recipesUI
+		m.recipes = recipes.New(m.cfg)
+		cmds = append(cmds, m.recipes.Init())
+	case recipes.SelectMessage:
+		m.currentUI = runRecipeUI
+		m.runRecipe = run.New(msg.Recipe)
+		cmds = append(cmds, m.runRecipe.Init())
 	}
 
 	switch m.currentUI {
 	case homeUI:
 		m.home, cmd = m.home.Update(msg)
-	case modelsUI:
-		m.models, cmd = m.models.Update(msg)
+	case recipesUI:
+		m.recipes, cmd = m.recipes.Update(msg)
+	case runRecipeUI:
+		m.runRecipe, cmd = m.runRecipe.Update(msg)
 	}
 
 	cmds = append(cmds, cmd)
@@ -99,8 +111,10 @@ func (m Model) View() string {
 	switch m.currentUI {
 	case homeUI:
 		return m.home.View()
-	case modelsUI:
-		return m.models.View()
+	case recipesUI:
+		return m.recipes.View()
+	case runRecipeUI:
+		return m.runRecipe.View()
 	default:
 		return ""
 	}
